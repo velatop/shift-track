@@ -9,6 +9,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('src/public'));
 
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/src/views/login.html');
+});
 app.use('/api/auth',      require('./src/routes/authRoutes'));
 app.use('/api/employees', require('./src/routes/employeeRoutes'));
 app.use('/api/shifts',    require('./src/routes/shiftRoutes'));
