@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShiftTrack – Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .navbar {
+            background: #1F497D;
+            color: white;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            font-size: 22px;
+        }
+
+        .navbar button {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .navbar button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .welcome {
+            background: white;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .welcome h2 {
+            color: #1F497D;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .welcome p {
+            color: #666;
+            font-size: 15px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid #1F497D;
+        }
+
+        .card .icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            color: #1F497D;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #E8F5E9;
+            color: #1E7B34;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <h1>🚀 ShiftTrack</h1>
+        <div>
+            <span id="usernameDisplay" style="margin-right: 16px; font-size: 14px;"></span>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome">
+            <h2>Welcome to ShiftTrack</h2>
+            <p>Warehouse Shift Management System — Sprint 1 MVP</p>
+        </div>
+
+        <div class="cards">
+            <div class="card">
+                <div class="icon">👷</div>
+                <h3>Employee Registration</h3>
+                <p>Register employees with name, position and certified skills.</p>
+                <span class="badge">✅ SC-10 Complete</span>
+            </div>
+            <div class="card">
+                <div class="icon">🛠️</div>
+                <h3>Skills Management</h3>
+                <p>Update employee certified skills. Changes reflect immediately.</p>
+                <span class="badge">✅ SC-11 Complete</span>
+            </div>
+            <div class="card">
+                <div class="icon">📅</div>
+                <h3>Shift Creation</h3>
+                <p>Create shifts with date, time and operational area.</p>
+                <span class="badge">✅ SC-12 Complete</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/';
+
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            document.getElementById('usernameDisplay').textContent = `👤 ${payload.username}`;
+        } catch (e) { }
+
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/';
+        }
+    </script>
+
+</body>
+
+</html>
