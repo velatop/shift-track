@@ -31,4 +31,24 @@ const createEmployee = async (req, res) => {
   }
 };
 
-module.exports = { getAllEmployees, createEmployee };
+const updateEmployeeSkills = async (req, res) => {
+  const { id } = req.params;
+  const { skillIds } = req.body;
+
+  try {
+    const employee = await Employee.findByPk(id);
+    if (!employee) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    const skills = await Skill.findAll({ where: { id: skillIds } });
+    await employee.setSkills(skills);
+    await employee.update({ skills_updated_at: new Date() });
+
+    const updated = await Employee.findByPk(id, { include: [Skill] });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: 'Error updating skills' });
+  }
+};
+module.exports = { getAllEmployees, createEmployee, updateEmployeeSkills };
