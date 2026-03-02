@@ -1,5 +1,5 @@
 const request  = require('supertest');
-const app      = require('../../server');
+const { app } = require('../../server');
 const { sequelize, createUser } = require('../../src/models');
 
 beforeAll(async () => {
@@ -8,7 +8,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
- await sequelize.close();
+  await sequelize.close();
 });
 
 describe('SC-17 — Secure Login', () => {

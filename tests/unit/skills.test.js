@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../../server');
+const { app } = require('../../server');
 const { sequelize, createUser, Employee, Skill } = require('../../src/models');
 let token, employeeId;
 
@@ -12,7 +12,9 @@ beforeAll(async () => {
     const res = await request(app).post('/api/auth/login').send({ username: 'super', password: 'Pass123!' });
     token = res.body.token;
 });
-afterAll(() => sequelize.close());
+afterAll(async () => {
+  await sequelize.close();
+});
 
 describe('SC-11 — Skills Management', () => {
     test('updates an employees skills', async () => {

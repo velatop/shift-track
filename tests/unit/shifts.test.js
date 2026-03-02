@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../../server');
+const { app } = require('../../server');
 const { sequelize, createUser } = require('../../src/models');
 let token;
 
@@ -9,7 +9,10 @@ beforeAll(async () => {
     const res = await request(app).post('/api/auth/login').send({ username: 'super', password: 'Pass123!' });
     token = res.body.token;
 });
-afterAll(() => sequelize.close());
+
+afterAll(async () => {
+    await sequelize.close();
+});
 
 describe('SC-12 — Shift Creation', () => {
     const shiftData = {

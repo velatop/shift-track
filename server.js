@@ -13,11 +13,12 @@ app.use('/api/auth',      require('./src/routes/authRoutes'));
 app.use('/api/employees', require('./src/routes/employeeRoutes'));
 app.use('/api/shifts',    require('./src/routes/shiftRoutes'));
 
+let server;
 sequelize.sync()
-.then(() => {
+  .then(() => {
     console.log('Synchronized database');
-    app.listen(PORT, () => console.log(`Server on port ${PORT}`));
+    server = app.listen(PORT, () => console.log(`Server on port ${PORT}`));
   })
   .catch(err => console.error('Error DB:', err));
 
-module.exports = app;
+module.exports = { app, server };
