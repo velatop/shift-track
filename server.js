@@ -13,7 +13,7 @@ app.use('/api/auth',      require('./src/routes/authRoutes'));
 app.use('/api/employees', require('./src/routes/employeeRoutes'));
 app.use('/api/shifts',    require('./src/routes/shiftRoutes'));
 
-sequelize.sync({ alter: true })
+sequelize.sync()
 .then(() => {
     console.log('Synchronized database');
     app.listen(PORT, () => console.log(`Server on port ${PORT}`));
