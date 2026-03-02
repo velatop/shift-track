@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShiftTrack – Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f4f6f9; }
+    .navbar {
+      background: #1F497D; color: white;
+      padding: 16px 32px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .navbar h1 { font-size: 20px; }
+    .navbar button {
+      background: transparent; border: 1px solid white;
+      color: white; padding: 7px 16px;
+      border-radius: 4px; cursor: pointer;
+    }
+    .container {
+      max-width: 800px; margin: 60px auto;
+      text-align: center; padding: 0 24px;
+    }
+    .card {
+      background: white; border-radius: 8px;
+      padding: 48px 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .card h2 { color: #1F497D; font-size: 28px; margin-bottom: 12px; }
+    .card p { color: #888; font-size: 15px; line-height: 1.6; }
+    .badge {
+      display: inline-block; background: #E8F0FB;
+      color: #1F497D; padding: 6px 16px;
+      border-radius: 20px; font-size: 13px;
+      margin-top: 24px; font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <h1>🚀 ShiftTrack</h1>
+    <div>
+      <span id="user" style="margin-right:16px; font-size:14px;"></span>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h2>Dashboard</h2>
+      <p>Full dashboard features are coming in Sprint 2.<br>
+      The core API is live and all endpoints are functional.</p>
+      <div class="badge">🏗️ Sprint 2 — Coming Soon</div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/';
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      document.getElementById('user').textContent = `👤 ${payload.username}`;
+    } catch(e) {}
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/';
+    }
+  </script>
+
+</body>
+</html>

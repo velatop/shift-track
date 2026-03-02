@@ -12,6 +12,9 @@ app.use(express.static('src/public'));
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/src/views/login.html');
 });
+app.get('/dashboard.html', (req, res) => {
+  res.sendFile(__dirname + '/src/views/dashboard.html');
+});
 app.use('/api/auth',      require('./src/routes/authRoutes'));
 app.use('/api/employees', require('./src/routes/employeeRoutes'));
 app.use('/api/shifts',    require('./src/routes/shiftRoutes'));
