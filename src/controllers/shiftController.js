@@ -35,7 +35,6 @@ const createShift = async (req, res) => {
 
 const { Shift, Employee, Skill } = require('../models');
 
-// GET /api/shifts/summary
 const getDailySummary = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
@@ -75,4 +74,37 @@ const getDailySummary = async (req, res) => {
   }
 };
 
-module.exports = { getAllShifts, createShift, getDailySummary };
+const getAvailableEmployees = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const shift = await Shift.findByPk(id);
+    if (!shift) return res.status(404).json({ error: 'Shift not found' });
+
+    const allEmployees = await Employee.findAll({ include: [Skill] });
+
+    const conflictingShifts = await Shift.findAll({
+      where: {
+        date:       shift.date,
+        start_time: shift.start_time
+      },
+      include: [Employee]
+    });
+
+    const assignedIds = new Set(
+      conflictingShifts.flatMap(s => s.Employees.map(e => e.id))
+    );
+
+    const available = allEmployees.filter(emp => {
+      const notConflicting = !assignedIds.has(emp.id);
+      const hasSkills      = emp.Skills && emp.Skills.length > 0;
+      return notConflicting && hasSkills;
+    });
+
+    res.json(available);
+  } catch (err) {
+    res.status(500).json({ error: 'Error filtering employees' });
+  }
+};
+
+module.exports = { getAllShifts, createShift, getDailySummary, getAvailableEmployees }
