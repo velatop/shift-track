@@ -1,72 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShiftTrack – Dashboard</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; background: #f4f6f9; }
-    .navbar {
-      background: #1F497D; color: white;
-      padding: 16px 32px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .navbar h1 { font-size: 20px; }
-    .navbar button {
-      background: transparent; border: 1px solid white;
-      color: white; padding: 7px 16px;
-      border-radius: 4px; cursor: pointer;
-    }
-    .container {
-      max-width: 800px; margin: 60px auto;
-      text-align: center; padding: 0 24px;
-    }
-    .card {
-      background: white; border-radius: 8px;
-      padding: 48px 32px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    .card h2 { color: #1F497D; font-size: 28px; margin-bottom: 12px; }
-    .card p { color: #888; font-size: 15px; line-height: 1.6; }
-    .badge {
-      display: inline-block; background: #E8F0FB;
-      color: #1F497D; padding: 6px 16px;
-      border-radius: 20px; font-size: 13px;
-      margin-top: 24px; font-weight: bold;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/dashboard.css">
 </head>
+
 <body>
 
   <nav class="navbar">
-    <h1>🚀 ShiftTrack</h1>
+    <h1>⚙️ ShiftTrack</h1>
     <div>
-      <span id="user" style="margin-right:16px; font-size:14px;"></span>
+      <span id="usernameDisplay"></span>
       <button onclick="logout()">Logout</button>
     </div>
   </nav>
 
   <div class="container">
-    <div class="card">
-      <h2>Dashboard</h2>
-      <p>Full dashboard features are coming in Sprint 2.<br>
-      The core API is live and all endpoints are functional.</p>
-      <div class="badge">🏗️ Sprint 2 — Coming Soon</div>
+
+    <div class="alert-banner" id="alertBanner">
+      <h3>⚠️ Shifts Without Sufficient Coverage</h3>
+      <div id="alertList"></div>
+    </div>
+
+    <div class="section-title">📅 Today's Shift Summary</div>
+    <div class="summary-grid" id="summaryGrid">
+      <p class="loading-text">Loading shifts...</p>
+    </div>
+
+  </div>
+
+  <div class="modal-overlay" id="assignModal">
+    <div class="modal">
+      <h3>Assign Employee</h3>
+      <p id="modalShiftInfo"></p>
+      <div id="availableList"></div>
+      <button class="close-btn" onclick="closeModal()">Cancel</button>
     </div>
   </div>
 
-  <script>
-    const token = localStorage.getItem('token');
-    if (!token) window.location.href = '/';
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      document.getElementById('user').textContent = `👤 ${payload.username}`;
-    } catch(e) {}
-    function logout() {
-      localStorage.removeItem('token');
-      window.location.href = '/';
-    }
-  </script>
+  <div class="toast" id="toast"></div>
+
+  <script src="/js/dashboard.js"></script>
 
 </body>
+
 </html>
