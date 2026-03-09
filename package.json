@@ -40,7 +40,8 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "verbose": true
+    "verbose": true,
+    "testMatch": ["**/tests/**/*.test.js"]
   },
   "seed": "node src/config/seed.js"
 }
