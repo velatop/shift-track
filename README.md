@@ -1,8 +1,8 @@
 # ShiftTrack
 
-> Warehouse Shift Management System — Sprint 1 MVP
+> Warehouse Shift Management System — Sprint 2 Feature Development
 
-**Live Demo:** https://shift-track.onrender.com ← replace with your Render URL
+**Live Demo:** https://shift-track.onrender.com
 
 ---
 
@@ -12,7 +12,9 @@ Warehouse supervisors waste hours daily manually matching employee availability 
 
 ---
 
-## Features — Sprint 1 MVP
+## Features
+
+### Sprint 1 — MVP
 
 | User Story | Feature | Status |
 |------------|---------|--------|
@@ -20,6 +22,15 @@ Warehouse supervisors waste hours daily manually matching employee availability 
 | SC-10 | Employee registration with name, position and certified skills | ✅ Complete |
 | SC-11 | Skills management — update employee skills with timestamp tracking | ✅ Complete |
 | SC-12 | Shift creation with duplicate prevention | ✅ Complete |
+
+### Sprint 2 — Feature Development
+
+| User Story | Feature | Status |
+|------------|---------|--------|
+| SC-13 | Daily summary of all shifts grouped by area with coverage status | ✅ Complete |
+| SC-14 | Filter available employees by skill and conflict-free schedule | ✅ Complete |
+| SC-15 | Assign employee to shift with single-click conflict detection | ✅ Complete |
+| SC-16 | Visual alerts for shifts with insufficient coverage | ✅ Complete |
 
 ---
 
@@ -48,16 +59,16 @@ Warehouse supervisors waste hours daily manually matching employee availability 
 shift-track/
 ├── src/
 │   ├── config/
-│   │   ├── database.js       ← Sequelize + SQLite connection
-│   │   └── seed.js           ← Default admin user + predefined skills
+│   │   ├── database.js         ← Sequelize + SQLite connection
+│   │   └── seed.js             ← Default admin user + predefined skills
 │   ├── controllers/
 │   │   ├── authController.js
 │   │   ├── employeeController.js
 │   │   └── shiftController.js
 │   ├── middleware/
-│   │   └── authMiddleware.js ← JWT authentication
+│   │   └── authMiddleware.js   ← JWT authentication
 │   ├── models/
-│   │   ├── index.js          ← Relationships + Factory pattern
+│   │   ├── index.js            ← Relationships + Factory pattern
 │   │   ├── Employee.js
 │   │   ├── Skill.js
 │   │   ├── Shift.js
@@ -70,14 +81,21 @@ shift-track/
 │   │   ├── login.html
 │   │   └── dashboard.html
 │   └── public/
+│       ├── css/
+│       │   └── dashboard.css
 │       └── js/
-│           └── auth.js
+│           ├── auth.js
+│           └── dashboard.js
 ├── tests/
 │   └── unit/
 │       ├── auth.test.js
 │       ├── employees.test.js
 │       ├── skills.test.js
-│       └── shifts.test.js
+│       ├── shifts.test.js
+│       ├── summary.test.js
+│       ├── availability.test.js
+│       ├── assignment.test.js
+│       └── alerts.test.js
 ├── .env.example
 ├── .github/
 │   └── workflows/
@@ -158,9 +176,13 @@ PASS tests/unit/auth.test.js
 PASS tests/unit/employees.test.js
 PASS tests/unit/skills.test.js
 PASS tests/unit/shifts.test.js
+PASS tests/unit/summary.test.js
+PASS tests/unit/availability.test.js
+PASS tests/unit/assignment.test.js
+PASS tests/unit/alerts.test.js
 
-Test Suites: 4 passed, 4 total
-Tests:       12 passed, 12 total
+Test Suites: 8 passed, 8 total
+Tests:       21 passed, 21 total
 ```
 
 ---
@@ -169,14 +191,30 @@ Tests:       12 passed, 12 total
 
 All endpoints except `/api/auth/login` require a Bearer token in the Authorization header.
 
+### Authentication
+
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | POST | `/api/auth/login` | No | Login, returns JWT token |
+
+### Employees
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | GET | `/api/employees` | Yes | List all employees with skills |
 | POST | `/api/employees` | Yes | Register new employee |
 | PUT | `/api/employees/:id/skills` | Yes | Update employee skills |
+
+### Shifts
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | GET | `/api/shifts` | Yes | List all shifts |
 | POST | `/api/shifts` | Yes | Create new shift |
+| GET | `/api/shifts/summary` | Yes | Daily summary with coverage status per shift |
+| GET | `/api/shifts/alerts` | Yes | Alerts for shifts with insufficient coverage |
+| GET | `/api/shifts/:id/available-employees` | Yes | Available employees for a specific shift |
+| POST | `/api/shifts/:id/assign` | Yes | Assign employee to shift |
 
 ### Example Requests
 
@@ -186,6 +224,23 @@ curl -X POST https://shift-track.onrender.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username": "admin", "password": "ShiftTrack2026!"}'
 ```
+
+**Create Shift:**
+```bash
+curl -X POST https://shift-track.onrender.com/api/shifts \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"date": "2026-04-01", "start_time": "06:00", "end_time": "14:00", "operational_area": "Receiving"}'
+```
+
+**Assign Employee to Shift:**
+```bash
+curl -X POST https://shift-track.onrender.com/api/shifts/1/assign \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"employeeId": 1}'
+```
+
 ---
 
 ## CI/CD Pipeline
@@ -196,13 +251,13 @@ Every push and pull request triggers GitHub Actions automatically:
 2. Runs the full test suite
 3. Reports results
 
-Render deploys automatically on every push to `main` only if the build succeeds.
+Render deploys automatically on every push to `main`.
 
 ---
 
 ## Git Workflow
 
-Feature branch development was used throughout Sprint 1:
+Feature branch development used throughout both sprints:
 
 ```
 main
@@ -211,23 +266,30 @@ main
  ├─ feature/SC-10-employee-registration
  ├─ feature/SC-11-skills-management
  ├─ feature/SC-12-shift-creation
- ├─ feature/production-seed-config
- ├─ feat/add-dashboard-placeholder
+ ├─ feature/SC-13-daily-summary
+ ├─ feature/SC-14-filter-available-employees
+ ├─ feature/SC-15-shift-assignment
+ ├─ feature/SC-16-coverage-alerts
+ ├─ feat/dashboard-full-ui
+ ├─ docs/update-readme-sprint2
  ├─ fix/duplicate-import-employeeRoutes
  ├─ fix/jest-force-exit
- └─ fix/github-actions-all-branches
+ └─ fix/remove-duplicate-routes
 ```
 
 ---
 
 ## Known Limitations
-- Dashboard is a placeholder — full UI coming in Sprint 2
+
+- SQLite is not suitable for high concurrency — PostgreSQL migration planned for Sprint 3
+- Free Render tier spins down after inactivity (first request may take ~30 seconds)
 
 ---
 
-## Planned for Sprint 2
+## Planned for Sprint 3
 
-- Full dashboard with employee and shift management UI
-- Shift assignment with skill-based matching engine
-- Daily coverage summary
-- Employee availability filtering
+- PostgreSQL migration for production-grade database
+- Employee availability scheduling
+- Shift history and reporting
+
+---
