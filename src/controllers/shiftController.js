@@ -139,4 +139,42 @@ const assignEmployee = async (req, res) => {
     res.status(500).json({ error: 'Error assigning employee' });
   }
 };
-module.exports = { getAllShifts, createShift, getDailySummary, getAvailableEmployees, assignEmployee };
+
+const getCoverageAlerts = async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const MIN_COVERAGE = 2;
+
+    const shifts = await Shift.findAll({
+      where: { date: today },
+      include: [Employee]
+    });
+
+    const alerts = shifts
+      .filter(shift => {
+        const count = shift.Employees ? shift.Employees.length : 0;
+        return count < MIN_COVERAGE;
+      })
+      .map(shift => {
+        const count = shift.Employees ? shift.Employees.length : 0;
+        const unfilled = MIN_COVERAGE - count;
+        return {
+          shift_id: shift.id,
+          operational_area: shift.operational_area,
+          start_time: shift.start_time,
+          end_time: shift.end_time,
+          assigned: count,
+          unfilled_positions: unfilled,
+          coverage_status: count === 0 ? 'uncovered' : 'partial'
+        };
+      });
+
+    res.json(alerts);
+  } catch (err) {
+    res.status(500).json({ error: 'Error getting coverage alerts' });
+  }
+};
+module.exports = {
+  getAllShifts, createShift, getDailySummary,
+  getAvailableEmployees, assignEmployee, getCoverageAlerts
+};
