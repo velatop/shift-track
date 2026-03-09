@@ -10,7 +10,5 @@ router.get('/:id/available-employees', authenticate, getAvailableEmployees);
 router.post('/:id/assign', authenticate, assignEmployee);
 router.get('/', authenticate, getAllShifts);
 router.post('/', authenticate, createShift);
-router.get('/', authenticate, getAllShifts);
-router.post('/', authenticate, createShift);
 
 module.exports = router;
