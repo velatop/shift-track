@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShiftTrack – Dashboard</title>
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
-
 <body>
 
   <nav class="navbar">
     <h1>⚙️ ShiftTrack</h1>
-    <div>
+    <div class="nav-right">
       <span id="usernameDisplay"></span>
-      <button onclick="logout()">Logout</button>
+      <button onclick="openNewShiftModal()">+ New Shift</button>
+      <button onclick="openNewEmployeeModal()">+ New Employee</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
   </nav>
 
@@ -32,12 +32,76 @@
 
   </div>
 
+  <!-- ASSIGN EMPLOYEE MODAL -->
   <div class="modal-overlay" id="assignModal">
     <div class="modal">
       <h3>Assign Employee</h3>
       <p id="modalShiftInfo"></p>
       <div id="availableList"></div>
-      <button class="close-btn" onclick="closeModal()">Cancel</button>
+      <button class="close-btn" onclick="closeModal('assignModal')">Cancel</button>
+    </div>
+  </div>
+
+  <!-- NEW SHIFT MODAL -->
+  <div class="modal-overlay" id="newShiftModal">
+    <div class="modal">
+      <h3>Create New Shift</h3>
+      <form id="newShiftForm" onsubmit="submitNewShift(event)">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="shiftDate" required />
+        </div>
+        <div class="form-group">
+          <label>Start Time</label>
+          <input type="time" id="shiftStart" required />
+        </div>
+        <div class="form-group">
+          <label>End Time</label>
+          <input type="time" id="shiftEnd" required />
+        </div>
+        <div class="form-group">
+          <label>Operational Area</label>
+          <select id="shiftArea" required>
+            <option value="">Select area...</option>
+            <option value="Receiving">Receiving</option>
+            <option value="Shipping">Shipping</option>
+            <option value="Inventory Control">Inventory Control</option>
+            <option value="Quality Control">Quality Control</option>
+            <option value="Loading Dock">Loading Dock</option>
+          </select>
+        </div>
+        <p class="form-error" id="shiftError"></p>
+        <div class="form-actions">
+          <button type="button" class="close-btn" onclick="closeModal('newShiftModal')">Cancel</button>
+          <button type="submit" class="submit-btn">Create Shift</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NEW EMPLOYEE MODAL -->
+  <div class="modal-overlay" id="newEmployeeModal">
+    <div class="modal">
+      <h3>Register New Employee</h3>
+      <form id="newEmployeeForm" onsubmit="submitNewEmployee(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="empName" placeholder="e.g. John Doe" required />
+        </div>
+        <div class="form-group">
+          <label>Position</label>
+          <input type="text" id="empPosition" placeholder="e.g. Loader" required />
+        </div>
+        <div class="form-group">
+          <label>Skills (select at least one)</label>
+          <div id="skillCheckboxes" class="skill-list">Loading skills...</div>
+        </div>
+        <p class="form-error" id="employeeError"></p>
+        <div class="form-actions">
+          <button type="button" class="close-btn" onclick="closeModal('newEmployeeModal')">Cancel</button>
+          <button type="submit" class="submit-btn">Register Employee</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -46,5 +110,4 @@
   <script src="/js/dashboard.js"></script>
 
 </body>
-
 </html>
