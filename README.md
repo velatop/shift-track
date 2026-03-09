@@ -1,6 +1,6 @@
 # ShiftTrack
 
-> Warehouse Shift Management System — Sprint 2 Feature Development
+> Warehouse Shift Management System — Full Capstone Project
 
 **Live Demo:** https://shift-track.onrender.com
 
@@ -8,7 +8,7 @@
 
 ## Problem It Solves
 
-Warehouse supervisors waste hours daily manually matching employee availability with the skills required by each operational area. ShiftTrack automates this process through a simple web interface that requires no technical training.
+Warehouse supervisors waste hours daily manually matching employee availability with the skills required by each operational area. ShiftTrack automates this process through a simple web interface that requires no technical training. A supervisor can log in, register employees with their certified skills, create shifts, assign personnel, and receive real-time coverage alerts — all in under three clicks per action.
 
 ---
 
@@ -32,6 +32,15 @@ Warehouse supervisors waste hours daily manually matching employee availability 
 | SC-15 | Assign employee to shift with single-click conflict detection | ✅ Complete |
 | SC-16 | Visual alerts for shifts with insufficient coverage | ✅ Complete |
 
+### Sprint 3 — Testing and Deployment
+
+| User Story | Feature | Status |
+|------------|---------|--------|
+| SC-19 | Full flow integration tests covering login → registration → shift → assignment | ✅ Complete |
+| SC-20 | Manual system testing with real users — all scenarios pass in ≤ 3 clicks | ✅ Complete |
+| SC-21 | CI/CD pipeline configured in GitHub Actions with automatic Render deployment | ✅ Complete |
+| SC-22 | Final repository documentation with design patterns and testing strategy | ✅ Complete |
+
 ---
 
 ## Tech Stack
@@ -47,9 +56,51 @@ Warehouse supervisors waste hours daily manually matching employee availability 
 
 ## Design Patterns
 
-- **MVC:** Routes → Controllers → Models separation
-- **Factory:** `createUser()` encapsulates password hashing logic
-- **Observer:** `skills_updated_at` timestamp notifies matching engine of skill changes
+### MVC (Model-View-Controller)
+Separates the application into three independent layers:
+- **Model:** Sequelize models (`Employee`, `Skill`, `Shift`, `User`) handle all data access and relationships
+- **View:** HTML files in `src/views/` served by Express as static responses
+- **Controller:** Business logic in `src/controllers/` processes requests and returns responses
+
+**Rationale:** Keeps concerns separated so each layer can be tested, modified, and scaled independently without affecting the others.
+
+### Factory Pattern
+The `createUser()` function in `src/models/index.js` encapsulates the bcrypt hashing logic required to create a valid user record.
+
+**Rationale:** Prevents raw password storage by centralizing the hashing concern in one reusable function, reducing the risk of misuse across the codebase.
+
+### Observer Pattern
+The `skills_updated_at` timestamp on the `Employee` model is updated every time an employee's skills are modified via the SC-11 endpoint.
+
+**Rationale:** Acts as a passive signal to external systems or future features that a skill change occurred, without requiring them to poll or compare records.
+
+---
+
+## Testing Strategy
+
+ShiftTrack follows a **Test-Driven Development (TDD)** approach across all three sprints of the SDLC.
+
+### Approach
+Each feature was implemented following the Red → Green → Refactor cycle:
+1. Write a failing test **(Red)**
+2. Implement the minimum code to make it pass **(Green)**
+3. Clean up without breaking tests **(Refactor)**
+
+### Test Types
+
+| Type | Location | Tests | Purpose |
+|------|----------|-------|---------|
+| Unit | `tests/unit/` | 21 | Test individual API endpoints in isolation |
+| Integration | `tests/integration/` | 7 | Test the full workflow end-to-end across all layers |
+| Manual | Performed on production URL | 11 scenarios | Validate UX and non-functional requirements |
+
+### Tools
+- **Jest** — Test runner with `--runInBand` and `--forceExit` flags
+- **Supertest** — HTTP assertions against the live Express app
+- **`sequelize.sync({ force: true })`** — Ensures a clean database state for each test suite
+
+### CI Integration
+GitHub Actions runs the full test suite on every push and pull request. Unit tests and integration tests run in separate steps for clear failure reporting. Render deployment is blocked automatically if any test fails.
 
 ---
 
@@ -87,15 +138,17 @@ shift-track/
 │           ├── auth.js
 │           └── dashboard.js
 ├── tests/
-│   └── unit/
-│       ├── auth.test.js
-│       ├── employees.test.js
-│       ├── skills.test.js
-│       ├── shifts.test.js
-│       ├── summary.test.js
-│       ├── availability.test.js
-│       ├── assignment.test.js
-│       └── alerts.test.js
+│   ├── unit/
+│   │   ├── auth.test.js
+│   │   ├── employees.test.js
+│   │   ├── skills.test.js
+│   │   ├── shifts.test.js
+│   │   ├── summary.test.js
+│   │   ├── availability.test.js
+│   │   ├── assignment.test.js
+│   │   └── alerts.test.js
+│   └── integration/
+│       └── fullFlow.test.js
 ├── .env.example
 ├── .github/
 │   └── workflows/
@@ -167,7 +220,14 @@ After running the seed:
 ## Running Tests
 
 ```bash
+# Run all tests
 npm test
+
+# Run only unit tests
+npm test -- --testPathPatterns='tests/unit'
+
+# Run only integration tests
+npm test -- --testPathPatterns='tests/integration'
 ```
 
 Expected output:
@@ -180,9 +240,10 @@ PASS tests/unit/summary.test.js
 PASS tests/unit/availability.test.js
 PASS tests/unit/assignment.test.js
 PASS tests/unit/alerts.test.js
+PASS tests/integration/fullFlow.test.js
 
-Test Suites: 8 passed, 8 total
-Tests:       21 passed, 21 total
+Test Suites: 9 passed, 9 total
+Tests:       28 passed, 28 total
 ```
 
 ---
@@ -248,16 +309,17 @@ curl -X POST https://shift-track.onrender.com/api/shifts/1/assign \
 Every push and pull request triggers GitHub Actions automatically:
 
 1. Installs dependencies
-2. Runs the full test suite
-3. Reports results
+2. Runs unit tests (`tests/unit/`)
+3. Runs integration tests (`tests/integration/`)
+4. Reports results
 
-Render deploys automatically on every push to `main`.
+Render deploys automatically on every push to `main` only when all tests pass.
 
 ---
 
 ## Git Workflow
 
-Feature branch development used throughout both sprints:
+Feature branch development used throughout all three sprints:
 
 ```
 main
@@ -270,10 +332,14 @@ main
  ├─ feature/SC-14-filter-available-employees
  ├─ feature/SC-15-shift-assignment
  ├─ feature/SC-16-coverage-alerts
+ ├─ feature/SC-19-integration-tests
+ ├─ feature/SC-20-system-testing
+ ├─ feature/SC-21-cicd-final
+ ├─ docs/SC-22-final-documentation
  ├─ feat/dashboard-full-ui
- ├─ docs/update-readme-sprint2
  ├─ fix/duplicate-import-employeeRoutes
  ├─ fix/jest-force-exit
+ ├─ fix/jest-testpathpatterns-flag
  └─ fix/remove-duplicate-routes
 ```
 
@@ -281,15 +347,5 @@ main
 
 ## Known Limitations
 
-- SQLite is not suitable for high concurrency — PostgreSQL migration planned for Sprint 3
-- Free Render tier spins down after inactivity (first request may take ~30 seconds)
-
----
-
-## Planned for Sprint 3
-
-- PostgreSQL migration for production-grade database
-- Employee availability scheduling
-- Shift history and reporting
-
----
+- SQLite is not suitable for high concurrency — PostgreSQL migration recommended for production scale
+- Free Render tier spins down after inactivity — first request may take ~30 seconds to respond
